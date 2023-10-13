@@ -1,3 +1,5 @@
+
+CREATE SCHEMA call_center;
 USE call_center;
 
 -- CREAR LAS TABLAS
