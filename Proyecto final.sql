@@ -5,19 +5,19 @@ USE proyecto_final;
 
 CREATE TABLE CLIENTES (
     ID_CLIENTE INT PRIMARY KEY AUTO_INCREMENT,
-    NOMBRE VARCHAR(50) NOT NULL,
+    NOMBRE VARCHAR(50),
     CREATED_AT DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE DEPARTAMENTOS (
     ID_DEPARTAMENTO INT PRIMARY KEY AUTO_INCREMENT,
-    NOMBRE VARCHAR(30) NOT NULL
+    NOMBRE VARCHAR(30)
 );
 
 CREATE TABLE PUESTOS (
     ID_PUESTO INT PRIMARY KEY AUTO_INCREMENT,
     ID_DEPARTAMENTO INT,
-    NOMBRE VARCHAR(30) NOT NULL,
+    NOMBRE VARCHAR(30),
     DESCRIPCION VARCHAR(50),
     FOREIGN KEY (ID_DEPARTAMENTO) REFERENCES DEPARTAMENTOS(ID_DEPARTAMENTO)
 );
@@ -25,7 +25,7 @@ CREATE TABLE PUESTOS (
 CREATE TABLE CAMPANIAS (
     ID_CAMPANIA INT PRIMARY KEY AUTO_INCREMENT,
     ID_CLIENTE INT,
-    NOMBRE VARCHAR(50) NOT NULL,
+    NOMBRE VARCHAR(50),
     FOREIGN KEY (ID_CLIENTE) REFERENCES CLIENTES(ID_CLIENTE)
 );
 
@@ -34,10 +34,10 @@ CREATE TABLE EMPLEADOS (
     ID_DEPARTAMENTO INT,
     ID_PUESTO INT,
     ID_CAMPANIA INT,
-    NOMBRE VARCHAR(30) NOT NULL,
-    APELLIDO VARCHAR(30) NOT NULL,
-    EMAIL VARCHAR(40) UNIQUE,
-    USUARIO VARCHAR(15) UNIQUE,
+    NOMBRE VARCHAR(30),
+    APELLIDO VARCHAR(30),
+    EMAIL VARCHAR(40),
+    USUARIO VARCHAR(15),
     PASS VARCHAR(65),
     FECHA_INGRESO DATETIME DEFAULT CURRENT_TIMESTAMP,
     FECHA_EGRESO DATETIME,
@@ -57,8 +57,8 @@ CREATE TABLE ASIGNACION_EMPLEADOS_CAMPANIAS (
 
 CREATE TABLE EVENTOS (
     ID_EVENTO INT PRIMARY KEY AUTO_INCREMENT,
-    NOMBRE VARCHAR(50) NOT NULL UNIQUE,
-    TIPO_EVENTO VARCHAR(20) NOT NULL
+    NOMBRE VARCHAR(50),
+    TIPO_EVENTO VARCHAR(20)
 );
 
 CREATE TABLE VENTAS (
@@ -151,6 +151,8 @@ CREATE VIEW ventas_empleados AS
 	ORDER BY cant_ventas
 	DESC);
 		
+SELECT * FROM ventas_empleados;
+
 CREATE VIEW asignacion_campanias AS
 	(SELECT A.ID_ASIGNACION, CL.NOMBRE AS cliente, E.LEGAJO, E.NOMBRE, E.APELLIDO, E.EMAIL, C.NOMBRE AS campania
 	FROM ASIGNACION_EMPLEADOS_CAMPANIAS A
@@ -162,10 +164,14 @@ CREATE VIEW asignacion_campanias AS
 	ON CL.ID_CLIENTE = C.ID_CLIENTE
 	ORDER BY cliente, E.LEGAJO);
     
+SELECT * FROM asignacion_campanias;
+
 CREATE VIEW empleados_activos AS
 	(SELECT LEGAJO, NOMBRE, APELLIDO, EMAIL, USUARIO
     FROM EMPLEADOS
     WHERE FECHA_EGRESO IS NULL);
+
+SELECT * FROM empleados_activos;
 
 CREATE VIEW empleados_por_departamento AS
 	(SELECT COUNT(E.LEGAJO) AS cant_empleados, D.NOMBRE AS departamento
@@ -174,6 +180,7 @@ CREATE VIEW empleados_por_departamento AS
     ON E.ID_DEPARTAMENTO = D.ID_DEPARTAMENTO
     GROUP BY D.ID_DEPARTAMENTO
     ORDER BY cant_empleados DESC);
+SELECT * FROM empleados_por_departamento;
 
 CREATE VIEW campanias_por_clientes AS
 	(SELECT COUNT(C.ID_CLIENTE) AS cant_campanias, CL.NOMBRE AS cliente
@@ -182,6 +189,8 @@ CREATE VIEW campanias_por_clientes AS
     ON C.ID_CLIENTE = CL.ID_CLIENTE
     GROUP BY CL.NOMBRE);
     
+SELECT * FROM campanias_por_clientes;
+
 ############################################################################# FUNCIONES ################################################################################
 
 DELIMITER $$
@@ -274,7 +283,7 @@ BEGIN
 END
 $$
 
-############################################################################# INFORMES ################################################################################
+############################################################################# INFORME  ################################################################################
 
 SELECT C.ID_CAMPANIA, C.NOMBRE AS nombre_campania, CL.NOMBRE AS nombre_cliente, COUNT(V.ID_VENTA) AS total_ventas
 FROM CAMPANIAS C
@@ -282,4 +291,3 @@ LEFT JOIN VENTAS V ON C.ID_CAMPANIA = V.ID_CAMPANIA
 LEFT JOIN CLIENTES CL ON C.ID_CLIENTE = CL.ID_CLIENTE
 GROUP BY C.ID_CAMPANIA
 ORDER BY nombre_cliente, nombre_campania;
-
